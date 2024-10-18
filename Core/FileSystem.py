@@ -6,6 +6,10 @@ protected_files = ["FileSystem.py", "README.md", "main.py", "Commands.py", "LICE
 
 
 def fcreate(filename):
+    if not filename:
+        print("Specify the filename after 'touch'")
+        return
+
     if not os.path.exists(filename):
         with open(filename, "w+") as file:
             print(f"File '{filename}' created")
@@ -13,26 +17,29 @@ def fcreate(filename):
         print(f"File '{filename}' already exists")
 
 
-def fdelete():
-    filenameDel_inp = input("Enter the name of the file or folder to delete: ").strip()
-    if filenameDel_inp in protected_folders or filenameDel_inp in protected_files:
-        print(f"'{filenameDel_inp}' is protected and cannot be deleted.")
+def fdelete(filename):
+    if not filename:
+        print("Specify the filename after 'delete'")
         return
 
-    if os.path.exists(filenameDel_inp):
+    if filename in protected_files or filename in protected_folders:
+        print(f"'{filename}' is protected and cannot be deleted.")
+        return
+
+    if os.path.exists(filename):
         try:
-            if os.path.isdir(filenameDel_inp):
-                shutil.rmtree(filenameDel_inp)
-                print(f"Folder '{filenameDel_inp}' deleted along with its contents")
+            if os.path.isdir(filename):
+                shutil.rmtree(filename)
+                print(f"Folder '{filename}' deleted along with its contents")
             else:
-                os.remove(filenameDel_inp)
-                print(f"File '{filenameDel_inp}' deleted")
+                os.remove(filename)
+                print(f"File '{filename}' deleted")
         except PermissionError:
-            print(f"Permission denied: cannot delete '{filenameDel_inp}'. Check your permissions.")
+            print(f"Permission denied: cannot delete '{filename}'. Check your permissions.")
         except Exception as e:
-            print(f"Error when deleting '{filenameDel_inp}': {e}")
+            print(f"Error when deleting '{filename}': {e}")
     else:
-        print(f"File or folder '{filenameDel_inp}' does not exist")
+        print(f"File or folder '{filename}' does not exist")
 
 
 def md(folder_name):
@@ -68,6 +75,10 @@ def rd(folder_name):
 
 
 def edit_file(filename):
+    if not filename:
+        print("Specify the filename after 'edit'")
+        return
+
     if not os.path.exists(filename):
         print(f"File '{filename}' does not exist. Creating a new file.")
         with open(filename, "w+") as file:
@@ -117,8 +128,13 @@ def ls():
 def lsl():
     for item in os.listdir("."):
         fullpath = os.path.join(".", item)
-        print(
-            f"{'d' if os.path.isdir(fullpath) else '-'} {'r' if os.access(fullpath, os.R_OK) else '-'}{'w' if os.access(fullpath, os.W_OK) else '-'} {'x' if os.access(fullpath, os.X.OK) else '-'} {item}")
+        try:
+            print(f"{'d' if os.path.isdir(fullpath) else '-'} "
+                  f"{'r' if os.access(fullpath, os.R_OK) else '-'}"
+                  f"{'w' if os.access(fullpath, os.W_OK) else '-'} "
+                  f"{'x' if os.access(fullpath, os.X_OK) else '-'} {item}")
+        except Exception as e:
+            print(f"Error accessing '{item}': {e}")
 
 
 def lsa():
@@ -128,10 +144,16 @@ def lsa():
 def lslh():
     for item in os.listdir("."):
         fullpath = os.path.join(".", item)
-        size = os.path.getsize(fullpath)
-        print(
-            f"{size} {'d' if os.path.isdir(fullpath) else '-'} {'r' if os.access(fullpath, os.R.OK) else '-'}{'w' if os.access(fullpath, os.W.OK) else '-'} {'x' if os.access(fullpath, os.X.OK) else '-'} {item}")
-
+        try:
+            size = os.path.getsize(fullpath)
+            print(
+                f"{size} {'d' if os.path.isdir(fullpath) else '-'} "
+                f"{'r' if os.access(fullpath, os.R_OK) else '-'}"
+                f"{'w' if os.access(fullpath, os.W_OK) else '-'} "
+                f"{'x' if os.access(fullpath, os.X_OK) else '-'} {item}"
+            )
+        except Exception as e:
+            print(f"Error accessing '{item}': {e}")
 
 def cd(folder_name=""):
     if not folder_name:
@@ -155,3 +177,23 @@ def cd(folder_name=""):
             print(f"'{folder_name}' is not a directory.")
         except Exception as e:
             print(f"Error when changing directory: {e}")
+
+def hide_folder(folder_name):
+    if os.path.exists(folder_name):
+        try:
+            os.system(f'attrib +h {folder_name}')
+            print(f"Folder '{folder_name}' is now hidden.")
+        except Exception as e:
+            print(f"Error when hiding the folder: {e}")
+    else:
+        print(f"Folder '{folder_name}' does not exist.")
+
+def unhide_folder(folder_name):
+    if os.path.exists(folder_name):
+        try:
+            os.system(f'attrib -h {folder_name}')
+            print(f"Folder '{folder_name}' is now visible.")
+        except Exception as e:
+            print(f"Error when unhiding the folder: {e}")
+    else:
+        print(f"Folder '{folder_name}' does not exist.")
