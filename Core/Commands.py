@@ -22,50 +22,61 @@ hide <foldername> - hide a folder
 unhide <foldername> - unhide a folder
 """)
 
-def command_list():
-    userInp = input(">")
-    if userInp == "help":
+
+def parse_command(user_input):
+    words = user_input.split()
+    if words:
+        command = words[0]
+        args = ' '.join(words[1:])
+        return command, args
+    return None, None
+    
+def command_list(user_input):
+    user_input = input(">")
+    command, args = parse_command(user_input)
+    if command == "help":
         help_menu()
-    elif userInp == "random":
+    elif command == "random":
+        import random
         random_int = random.randint(0, 327679736)
         print(random_int)
-    elif userInp == "shutdown":
+    elif command == "shutdown":
         exit()
-    elif userInp.startswith("touch"):
-        filename = userInp[6:].strip()
+    elif command == "touch":
+        filename = args.strip()
         fcreate(filename)
-    elif userInp.startswith("edit"):
-        filename = userInp[5:].strip()
+    elif command == "edit":
+        filename = args.strip()
         edit_file(filename)
-    elif userInp.startswith("delete"):
-        filename = userInp[7:].strip()
+    elif command == "delete":
+        filename = args.strip()
         if not filename:
             print("Specify the filename after 'delete'")
         else:
             fdelete(filename)
-
-    elif userInp.startswith("md"):
-        folder_name = userInp[3:].strip()
+    elif command == "md":
+        folder_name = args.strip()
         md(folder_name)
-    elif userInp.startswith("rd"):
-        folder_name = userInp[3:].strip()
+    elif command == "rd":
+        folder_name = args.strip()
         rd(folder_name)
-    elif userInp == "ls":
+    elif command == "ls":
         ls()
-    elif userInp == "lsl":
+    elif command == "lsl":
         lsl()
-    elif userInp == "lsa":
+    elif command == "lsa":
         lsa()
-    elif userInp == "lslh":
+    elif command == "lslh":
         lslh()
-    elif userInp.startswith("cd"):
-        folder_name = userInp[3:].strip()
+    elif command == "cd":
+        folder_name = args.strip()
         cd(folder_name)
-    elif userInp.startswith("hide"):
-        folder_name = userInp[5:].strip()
+    elif command == "hide":
+        folder_name = args.strip()
         hide_folder(folder_name)
-    elif userInp.startswith("unhide"):
-        folder_name = userInp[7:].strip()
+    elif command == "unhide":
+        folder_name = args.strip()
         unhide_folder(folder_name)
     else:
         print("Unknown command. Type 'help' for a list of commands.")
+
